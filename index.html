@@ -1,0 +1,219 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Pub Sub Sample</title>
+		<script type="text/javascript" src="./assets/pubsub.js"></script>
+		<script type="text/javascript" src="./assets/zepto.min.js"></script>
+		<script type="text/javascript">
+			/* Menu gestion with zepto */
+			$(document).ready(function() {
+			    $('#menuLink').click(function() {
+			    	if( $('#layout').hasClass('active') ) {
+			    		$('#layout').removeClass('active');
+				    	$('#menu').removeClass('active');
+				    	$('#menuLink').removeClass('active');
+			    	} else {
+			    		$('#layout').addClass('active');
+				    	$('#menu').addClass('active');
+				    	$('#menuLink').addClass('active');
+			    	}
+			    });
+			});
+		</script>
+		<link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.3.0/pure-min.css">
+		<link rel="stylesheet" href="./assets/style.css">
+	</head>
+	<body>
+		<div class="pure-g-r" id="layout">
+			<a id="menuLink" class="pure-menu-link" href="#menu">
+				<span></span>
+			</a>
+
+			<div class="pure-u" id="menu">
+				<div class="pure-menu pure-menu-open">
+				    <a class="pure-menu-heading">PubSub.JS</a>
+
+				    <ul>
+				        <li><a href="#start">Home</a></li>
+				        <li><a href="#sample1-2">Sample 1 & 2</a></li>
+				        <li><a href="#sample3-4">Sample 3 & 4</a></li>
+				    </ul>
+				</div>
+			</div>
+
+	    	<div class="pure-u-1">
+	    		
+	    		<div class="header">
+					<h1>PubSub.JS</h1>
+					<h2>Some samples of PubSub.JS</h2>
+				</div>
+
+	    		<div class="content">
+					
+					<div class="pure-g-r" id="sample1-2">
+			    		<div class="pure-u-1-2">
+							<h3>Sample 1.</h3> 
+							<h4>Simple subscribtion to an event</h4>
+							<button class="pure-button" data-action="buttonClicked"> Click Me </button>
+							<pre width="40%">// Listener
+pubsub.subscribe('clickedEvent', function() {
+	alert('clickedEvent');
+});
+
+//
+$('[data-action=buttonClicked]').click(function() {
+	var conf = confirm('buttonClicked -> you want publish to the main ? -> this is clickedEvent');
+// Publish event
+if(conf) pubsub.publish('clickedEvent');
+});
+							</pre>
+						</div>
+
+						<div class="pure-u-1-2">
+							<h3>Sample 2.<h3>
+							<h4>Share Data</h4>
+							<form id="first-form" class="pure-form pure-form-stacked">
+								<fieldset>
+									<label for="name">Your Name</label>
+									<input type="text" name="name" placeholder="name"/>
+									<label for="surname">Your Surname</label>
+									<input type="text" name="surname" placeholder="surname"/>
+									<button type="submit" class="pure-button pure-button-primary">Submit</button>
+								</fieldset>
+							</form>
+							<pre width="40%">// Listener
+pubsub.subscribe('submitEvent', function(data) {
+
+alert('Hello ' + data[0].value + ' ' + data[1].value);
+
+});
+
+$('#first-form').submit(function() {
+
+var user = $(this).serializeArray();
+
+// Publish event with data
+pubsub.publish('submitEvent', [user]);
+
+return false;
+});
+							</pre>
+						</div>
+					</div>
+
+					<div class="pure-g-r"  id="sample3-4">
+			    		<div class="pure-u-1-2">
+							<h3>Sample 3.</h3>
+							<h4>Simple subscribtion to an event / and unsubscribtion</h4>
+							<button class="pure-button" data-action="buttonClicked2"> Click Me </button>
+							<pre width="40%">// Listener
+var clickedEvent2 = pubsub.subscribe('clickedEvent2', function() {
+
+// Unsubscribe
+pubsub.unsubscribe(clickedEvent2);
+
+alert('unsubscribe to clickedEvent2 (you don\'t show this alert after)');
+});
+
+$('[data-action=buttonClicked2]').click(function() {
+	var conf = confirm('buttonClicked2 -> you want publish to the main ? -> this is clickedEvent2');
+
+	if(conf) pubsub.publish('clickedEvent2');
+});
+							</pre>
+						</div>
+
+						<div class="pure-u-1-2">
+							<h3>Sample 4.</h3>
+							<h4>Share Event & Data from Ajax block & Main</h4>
+							<span id="hello"></span>
+							<div id="loadZone"></div>
+							<button class="pure-button" data-action="loadAjaxBlock"> Load </button>
+							<pre width="40%">// Listener in the Main
+$('[data-action=loadAjaxBlock]').click(function() {
+
+$(this).hide();
+$('#loadZone').load('block.html');
+
+});
+
+pubsub.subscribe('submitEvent2', function(data) {
+
+$('#hello').html('Hello ' + data[0].value + ' ' + data[1].value);
+$('[data-action=loadAjaxBlock]').show();
+
+});	
+							</pre>
+
+							<pre width="40%">// Event Creation in the ajax block
+$('#second-form').submit(function() {
+
+var user = $(this).serializeArray();
+pubsub.publish('submitEvent2', [user]);
+
+$(this).remove();
+return false;
+});
+							</pre>
+						</div>
+					</div>
+
+				</div>
+
+			</div>
+
+		</div>
+	</body>
+
+	<script type="text/javascript">
+		$(document).ready(function() {
+
+			// Event click
+			pubsub.subscribe('clickedEvent', function() {
+				alert('clickedEvent');
+			});
+
+			$('[data-action=buttonClicked]').click(function() {
+				var conf = confirm('buttonClicked -> you want publish to the main ? -> this is clickedEvent');
+
+				if(conf) pubsub.publish('clickedEvent');
+			});
+
+			// Event submit with share data
+			pubsub.subscribe('submitEvent', function(data) {
+				alert('Hello ' + data[0].value + ' ' + data[1].value);
+			});
+
+			$('#first-form').submit(function() {
+				var user = $(this).serializeArray();
+				pubsub.publish('submitEvent', [user]);
+				return false;
+			});
+
+			// Event click2
+			var clickedEvent2 = pubsub.subscribe('clickedEvent2', function() {
+				pubsub.unsubscribe(clickedEvent2);
+				alert('unsubscribe to clickedEvent2 (you don\'t show this alert after)');
+			});
+
+			$('[data-action=buttonClicked2]').click(function() {
+				var conf = confirm('buttonClicked2 -> you want publish to the main ? -> this is clickedEvent2');
+
+				if(conf) pubsub.publish('clickedEvent2');
+			});
+
+			// Event submit becoming from ajax block with share data
+			$('[data-action=loadAjaxBlock]').click(function() {
+				$(this).hide();
+				$('#loadZone').load('block.html');
+			});
+
+			pubsub.subscribe('submitEvent2', function(data) {
+				$('#hello').html('Hello ' + data[0].value + ' ' + data[1].value);
+				$('[data-action=loadAjaxBlock]').show();
+			});
+
+		});
+	</script>
+
+</html>

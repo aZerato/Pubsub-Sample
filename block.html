@@ -1,0 +1,19 @@
+<div>
+	<form id="second-form" class="pure-form pure-form-stacked">
+		<fieldset>
+			<label for="name">Your Name</label>
+			<input type="text" name="name" placeholder="name"/>
+			<label for="surname">Your Surname</label>
+			<input type="text" name="surname" placeholder="surname"/>
+			<button type="submit" class="pure-button pure-button-primary">Submit</button>
+		</fieldset>
+	</form>
+</div>
+<script type="text/javascript">
+	$('#second-form').submit(function() {
+		var user = $(this).serializeArray();
+		pubsub.publish('submitEvent2', [user]);
+		$(this).remove();
+		return false;
+	});
+</script>
